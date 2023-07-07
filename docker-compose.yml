@@ -1,0 +1,11 @@
+version: "3"
+services:
+  visit_mip:
+    mem_limit: 16g
+    restart: always
+    build: .
+    container_name: "visitMip"
+    working_dir: "/root/"
+    tty: true
+    volumes:
+      - ./opt:/root/opt
