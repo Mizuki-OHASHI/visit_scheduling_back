@@ -1,35 +1,11 @@
-import json
-import os
-import signal
-import sys
-import time
-import io
-import random
-import http.server
-import urllib.parse
+from http import HTTPStatus
+import json, traceback
 from datetime import datetime
-from typing import List
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from socketserver import ThreadingMixIn
 
-
-class UserResForHTTPGet:
-    def __init__(self, id: str, name: str, age: int):
-        self.id = id
-        self.name = name
-        self.age = age
-
-
-class NewUserNameAge:
-    def __init__(self, name: str, age: int):
-        self.name = name
-        self.age = age
-
-
-class NewUserId:
-    def __init__(self, id: str):
-        self.id = id
+from optimize import workflow
 
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
@@ -38,11 +14,11 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
 
 class UserRequestHandler(BaseHTTPRequestHandler):
     def do_POST(self):
-        if self.path.startswith("/user"):
+        if self.path.startswith("/v1"):
             content_type = self.headers.get("Content-Type", "")
 
             if content_type != "application/json":
-                self.send_response(400)
+                self.send_response(HTTPStatus.BAD_REQUEST)
                 self.end_headers()
                 return
 
@@ -50,31 +26,40 @@ class UserRequestHandler(BaseHTTPRequestHandler):
             body = self.rfile.read(content_length)
             data = json.loads(body.decode())
 
-            if "name" not in data or "age" not in data:
-                self.send_response(400)
+            if (
+                "chouseisan" not in data
+                or "memberinfo" not in data
+                or "candidateinfo" not in data
+                or "considergender" not in data
+            ):
+                self.send_response(HTTPStatus.BAD_REQUEST)
                 self.end_headers()
                 return
 
-            name = data["name"]
-            age = data["age"]
+            chouseisan = data["chouseisan"]
+            memberInfo = data["memberinfo"]
+            candidateInfo = data["candidateinfo"]
+            consider_gender = bool(data["considergender"])
 
-            if not name or not age:
-                self.send_response(400)
-                self.end_headers()
-                return
+            start = datetime.now()
+            # try:
+            response_data = workflow(
+                chouseisan, memberInfo, candidateInfo, consider_gender
+            )
+            # except:
+            #     response_data = {"status": "error", "detail": traceback.format_exc()}
+            #     print(traceback.format_exc())
 
-            user_id = create_user(name, age)
+            response_body = json.dumps(response_data).encode("utf-8")
 
-            if user_id is None:
-                self.send_response(500)
-                self.end_headers()
-                return
+            delta = datetime.now() - start
+            print("==" * 64)
+            print(f"実行時間\t: {delta.seconds}.{delta.microseconds} 秒\n\n")
 
-            response_data = {"id": user_id}
-            response_body = json.dumps(response_data).encode()
-
-            self.send_response(200)
-            self.send_header("Content-type", "application/json")
+            self.send_response(HTTPStatus.OK)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(response_body)))
+            self.send_header("Access-Control-Allow-Origin", "*")  # Add this line
             self.end_headers()
             self.wfile.write(response_body)
 
@@ -82,14 +67,12 @@ class UserRequestHandler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Access-Control-Allow-Headers", "*")
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header(
-            "Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS"
-        )
+        self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
         self.end_headers()
 
 
 def main():
-    port = 8000
+    port = 8080
     server = ThreadedHTTPServer(("", port), UserRequestHandler)
     print(f"Server running on port {port}")
     server.serve_forever()
