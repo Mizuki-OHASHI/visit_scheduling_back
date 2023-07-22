@@ -31,7 +31,7 @@ RUN python -m pip install mip && \
 COPY ./opt/__pycache__/main.cpython-310.pyc main.pyc
 COPY ./opt/optimize.py optimize.py
 
-CMD python main.cpython-310
+CMD python main.pyc
 
 # RUN apt-get install  coinor-cbc coinor-libcbc-dev
 # RUN python -m pip install jupyterlab
