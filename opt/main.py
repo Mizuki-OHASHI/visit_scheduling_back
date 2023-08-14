@@ -59,14 +59,19 @@ class UserRequestHandler(BaseHTTPRequestHandler):
             self.send_response(HTTPStatus.OK)
             self.send_header("Content-Type", "application/json")
             self.send_header("Content-Length", str(len(response_body)))
-            self.send_header("Access-Control-Allow-Origin", "*")  # Add this line
+            self.send_header(
+                "Access-Control-Allow-Origin",
+                "https://visit-scheduling-front.vercel.app",
+            )  # Add this line
             self.end_headers()
             self.wfile.write(response_body)
 
     def do_OPTIONS(self):
         self.send_response(200)
         self.send_header("Access-Control-Allow-Headers", "*")
-        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header(
+            "Access-Control-Allow-Origin", "https://visit-scheduling-front.vercel.app"
+        )
         self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
         self.end_headers()
 
