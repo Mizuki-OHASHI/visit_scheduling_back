@@ -1,5 +1,5 @@
 from http import HTTPStatus
-import json, traceback
+import json
 from datetime import datetime
 
 from http.server import BaseHTTPRequestHandler, HTTPServer
