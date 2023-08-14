@@ -53,7 +53,7 @@ class UserRequestHandler(BaseHTTPRequestHandler):
             response_body = json.dumps(response_data).encode("utf-8")
 
             delta = datetime.now() - start
-            print("==" * 64)
+            # print("==" * 64)
             print(f"実行時間\t: {delta.seconds}.{delta.microseconds} 秒\n\n")
 
             self.send_response(HTTPStatus.OK)
