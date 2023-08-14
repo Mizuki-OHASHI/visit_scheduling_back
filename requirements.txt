@@ -1,0 +1,8 @@
+mip_helper==0.7.8
+mip==1.13.0
+psycopg2-binary==2.7.4
+sqlalchemy==1.2.5
+numpy==1.14.2
+pandas==0.22.0
+# For quick summary statistics on CSV files
+csvkit==1.0.3
