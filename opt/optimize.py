@@ -84,9 +84,10 @@ def read_data(chouseisan, memberInfo, candidateInfo):
         [*map(lambda x: x.split("#") if "#" in x else [x, 1], todo)]
         for todo in candidate_todo
     ]
-    candidate_todo = [
-        [[todo[0], int(todo[1])] for todo in todo_ls] for todo_ls in candidate_todo
-    ]
+    candidate_todo = np.array(
+        [[[todo[0], int(todo[1])] for todo in todo_ls] for todo_ls in candidate_todo],
+        dtype=object,
+    )
 
     return (
         information,
@@ -94,7 +95,7 @@ def read_data(chouseisan, memberInfo, candidateInfo):
         members,
         candidate[candidate_group != "cancel"],
         candidate_group[candidate_group != "cancel"],
-        candidate_todo,
+        candidate_todo[candidate_group != "cancel"],
     )
 
 
@@ -255,59 +256,59 @@ class VisitModel(Model):
             except:
                 return obj
 
-        # def export_log(X_opt, y_opt, a_opt, b_opt):
-        #     print(f"\n\n目的関数値\t: {int(self.objective_value)}")
+        def export_log(X_opt, y_opt, a_opt, b_opt):
+            print(f"\n\n目的関数値\t: {int(self.objective_value)}")
 
-        #     print("==" * 64)
-        #     print("候補日情報\n")
-        #     print("候補日\t\tグループ\t作業内容")
-        #     for i, c in enumerate(self.candidate):
-        #         print(f"{c}\t{self.candidate_group[i]}\t\t{self.candidate_todo[i]}")
-        #     print("--" * 64)
-        #     print(
-        #         f"訪問回数\t: {sum(y_opt)} 回",
-        #     )
-        #     print(f"回答者\t\t: {len(self.members)} 人")
-        #     print(f"訪問可能人数\t: {sum(a_opt)} 人")
-        #     print(f"訪問日\t\t:", *self.simpl_date[y_opt == 1])
-        #     print(f"先輩ドライバー\t:", *self.simpl_date[b_opt == 1])
-        #     print("--" * 64)
-        #     print("回答者別\n\n● : ドライバー\t◯ : 訪問あり\t× : 訪問なし\n")
-        #     for m in range(len(self.members)):
-        #         print(
-        #             (self.members[m] + "      ")[:6] + "\t:",
-        #             *np.where(
-        #                 X_opt[m][y_opt == 1] == 1,
-        #                 "●" if self.information[self.members[m]][1] > 0 else "◯",
-        #                 "×",
-        #             ),
-        #             "\t",
-        #             *self.simpl_date[X_opt[m] == 1] if X_opt[m].sum() else [" -"],
-        #         )
-        #     print(
-        #         "先輩ドライバー\t:",
-        #         *np.where(b_opt[y_opt == 1] == 1, "●", "×"),
-        #         "\t",
-        #         *self.simpl_date[b_opt == 1] if b_opt.sum() else [" -"],
-        #     )
+            print("==" * 64)
+            print("候補日情報\n")
+            print("候補日\t\tグループ\t作業内容")
+            for i, c in enumerate(self.candidate):
+                print(f"{c}\t{self.candidate_group[i]}\t\t{self.candidate_todo[i]}")
+            print("--" * 64)
+            print(
+                f"訪問回数\t: {sum(y_opt)} 回",
+            )
+            print(f"回答者\t\t: {len(self.members)} 人")
+            print(f"訪問可能人数\t: {sum(a_opt)} 人")
+            print(f"訪問日\t\t:", *self.simpl_date[y_opt == 1])
+            print(f"先輩ドライバー\t:", *self.simpl_date[b_opt == 1])
+            print("--" * 64)
+            print("回答者別\n\n● : ドライバー\t◯ : 訪問あり\t× : 訪問なし\n")
+            for m in range(len(self.members)):
+                print(
+                    (self.members[m] + "      ")[:6] + "\t:",
+                    *np.where(
+                        X_opt[m][y_opt == 1] == 1,
+                        "●" if self.information[self.members[m]][1] > 0 else "◯",
+                        "×",
+                    ),
+                    "\t",
+                    *self.simpl_date[X_opt[m] == 1] if X_opt[m].sum() else [" -"],
+                )
+            print(
+                "先輩ドライバー\t:",
+                *np.where(b_opt[y_opt == 1] == 1, "●", "×"),
+                "\t",
+                *self.simpl_date[b_opt == 1] if b_opt.sum() else [" -"],
+            )
 
-        #     print("--" * 64)
-        #     print("訪問日別\n")
-        #     visiters = {}
-        #     for d in self.simpl_date[y_opt == 1]:
-        #         visiters[d] = []
-        #     for m, x in enumerate(X_opt):
-        #         for d in range(len(self.simpl_date)):
-        #             if X_opt[m, d] == 1:
-        #                 visiters[self.simpl_date[d]].append(
-        #                     (self.members[m] + "      ")[:6] + "\t"
-        #                 )
-        #     for d in range(len(self.candidate)):
-        #         if y_opt[d] == 1 and b_opt[d] == 1:
-        #             visiters[self.simpl_date[d]].append("先輩ドライバー\t")
+            print("--" * 64)
+            print("訪問日別\n")
+            visiters = {}
+            for d in self.simpl_date[y_opt == 1]:
+                visiters[d] = []
+            for m, x in enumerate(X_opt):
+                for d in range(len(self.simpl_date)):
+                    if X_opt[m, d] == 1:
+                        visiters[self.simpl_date[d]].append(
+                            (self.members[m] + "      ")[:6] + "\t"
+                        )
+            for d in range(len(self.candidate)):
+                if y_opt[d] == 1 and b_opt[d] == 1:
+                    visiters[self.simpl_date[d]].append("先輩ドライバー\t")
 
-        #     for d in visiters:
-        #         print(f"{d}\t\t:", *visiters[d])
+            for d in visiters:
+                print(f"{d}\t\t:", *visiters[d])
 
         def export_txt(X_opt, y_opt, a_opt, b_opt):
             visiters = {}
