@@ -76,8 +76,8 @@ def read_data(chouseisan, memberInfo, candidateInfo):
     candidate_group = np.array([c["group"] for c in candidateInfo])
     candidate_todo = [
         *map(
-            lambda x: "cancel"
-            if x["todo"] == "cancel"
+            lambda x: ["cancel"]
+            if x["todo"] == ["cancel"]
             else x["todo"].split("/")
             if x["todo"] != ""
             else [],
@@ -85,14 +85,14 @@ def read_data(chouseisan, memberInfo, candidateInfo):
         )
     ]
     candidate_todo = [
-        "cancel"
-        if todo == "cancel"
+        ["cancel"]
+        if todo == ["cancel"]
         else [*map(lambda x: x.split("#") if "#" in x else [x, 1], todo)]
         for todo in candidate_todo
     ]
     candidate_todo = [
-        "cancel"
-        if todo_ls == "cancel"
+        ["cancel"]
+        if todo_ls == ["cancel"]
         else [[todo[0], int(todo[1])] for todo in todo_ls]
         for todo_ls in candidate_todo
     ]
@@ -137,7 +137,7 @@ class VisitModel(Model):
                 self.add_var(name=f"X_{i}", var_type="B")
                 if (
                     schedule.flatten()[i]
-                    and candidate_todo[i % schedule.shape[1]] != "cancel"
+                    and candidate_todo[i % schedule.shape[1]] != ["cancel"]
                 )
                 else 0
                 for i in range(schedule.size)
