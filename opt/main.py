@@ -12,8 +12,8 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     pass
 
 
-# Access_Control_Allow_Origin = "https://visit-scheduling-front.vercel.app"
-Access_Control_Allow_Origin = "http://localhost:3000"
+Access_Control_Allow_Origin = "https://visit-scheduling-front.vercel.app"
+# Access_Control_Allow_Origin = "http://localhost:3000"
 
 
 class UserRequestHandler(BaseHTTPRequestHandler):
