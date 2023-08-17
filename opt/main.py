@@ -12,6 +12,10 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     pass
 
 
+Access_Control_Allow_Origin = "https://visit-scheduling-front.vercel.app"
+# Access_Control_Allow_Origin = "http://localhost:3000"
+
+
 class UserRequestHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         if self.path.startswith("/v1"):
@@ -60,8 +64,7 @@ class UserRequestHandler(BaseHTTPRequestHandler):
             self.send_header("Content-Type", "application/json")
             self.send_header("Content-Length", str(len(response_body)))
             self.send_header(
-                "Access-Control-Allow-Origin",
-                "https://visit-scheduling-front.vercel.app",
+                "Access-Control-Allow-Origin", Access_Control_Allow_Origin
             )  # Add this line
             self.end_headers()
             self.wfile.write(response_body)
@@ -69,9 +72,7 @@ class UserRequestHandler(BaseHTTPRequestHandler):
     def do_OPTIONS(self):
         self.send_response(200)
         self.send_header("Access-Control-Allow-Headers", "*")
-        self.send_header(
-            "Access-Control-Allow-Origin", "https://visit-scheduling-front.vercel.app"
-        )
+        self.send_header("Access-Control-Allow-Origin", Access_Control_Allow_Origin)
         self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
         self.end_headers()
 
